@@ -105,7 +105,17 @@ const toto = Zip([1, 2], [true, false], ["coucou"])
  * Lever l'erreur à l'aide de throw new Error( ....... )
  */
 export function ProduitScalaire(V1: readonly number[], V2: readonly number[]): number {
-    return NaN;
+    if ((V1.length===0)||(V2.length===0)){
+        throw new Error("Les vecteurs doivent être non vides")
+    }
+    if (V1.length!=V2.length){
+        throw new Error("Les vecteurs doivent être de même taille")
+    }
+    let Vres:number=0;
+    for(let i=0;i<V1.length;i++){
+        Vres=Vres+V1[i]*V2[i];
+    }
+    return Vres;
 }
 
 
@@ -121,11 +131,46 @@ export function ProduitScalaire(V1: readonly number[], V2: readonly number[]): n
  *      - "M2 ne peut pas être vide"  -> La matrice M2 est vide (0 ligne u 0 colonne)
  *      - "Les matrices doivent avoir la même taille"  -> La matrice est vide (0 lignes u 0 colonnes)
  */
-type ScalarMatrix = unknown; // à redéfinir
-type AjoutResult  = unknown; // à redéfinir
+type ScalarMatrix = readonly number[][]; // à redéfinir
+type SuccessResult = { success: true; result: ScalarMatrix };
+type ErrorResult = { success: false; error: string };
+type AjoutResult = SuccessResult | ErrorResult;
+
 
 export function AjoutMatrices(M1: ScalarMatrix, M2: ScalarMatrix): AjoutResult {
-    return undefined;
+    let Res:AjoutResult;
+    let nbLigne_M1=M1.length;
+    let nbLigne_M2=M2.length;
+    let nbCol_M1_0=M1[0].length;
+    let nbCol_M2_0=M2[0].length;
+    const M1rectang:ScalarMatrix=M1.filter(x=>x.length==nbCol_M1_0);
+    const M2rectang:ScalarMatrix=M2.filter(x=>x.length==nbCol_M2_0);
+    if (nbLigne_M1!=nbLigne_M2){
+        Res={success:false,error:'Les matrices doivent avoir la même taille'};
+    }
+    else if(M1rectang.length!=nbLigne_M1){
+        Res={success:false,error:'M1 nest pas bien formée'};
+    }
+    else if(M2rectang.length!=nbLigne_M2){
+        Res={success:false,error:'M2 nest pas bien formée'};
+    }
+    else if((M1rectang.length===0)&&(M1rectang.length===0))
+        Res={success:false,error:'M1 est vide'};
+    
+    else if((M2rectang.length===0)&&(M2rectang.length===0))
+        Res={success:false,error:'M2 est vide'};
+    else{
+        let S:number[][]=[];
+        for(let i=0;i<nbLigne_M1;i++){
+            let row: number[] = [];
+            for(let j=0;j<nbCol_M1_0;j++){
+                row[j]=M1[i][j]+M2[i][j];
+            }
+            S.push(row);
+        }
+        Res={success:true,result:S as ScalarMatrix};
+    }
+    return Res;
 }
 
 /**
@@ -138,3 +183,4 @@ export function AjoutMatrices(M1: ScalarMatrix, M2: ScalarMatrix): AjoutResult {
 /**
  * Codez une classe immuable Matrice implémentant l'ajout et la multiplication de matrices.
  */
+
